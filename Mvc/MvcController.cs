@@ -25,6 +25,15 @@ namespace NetCore.Common.Mvc
             }
         }
 
+        public string DisplayName
+        {
+            get
+            {
+                AssertUtils.AssertTrue(User.Identity.IsAuthenticated);
+                return User.GetDisplayName();
+            }
+        }
+
         public bool IsAnyRole(params string[] roles)
         {
             AssertUtils.AssertTrue(User.Identity.IsAuthenticated);
