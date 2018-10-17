@@ -29,8 +29,8 @@ namespace NetCore.Common.Auth
 
         public static string GetDisplayName(this ClaimsPrincipal user)
         {
-            var claim = user.FindFirst(DisplayName);
-            return claim?.Value;
+            var claim = AssertUtils.AssertNotNull(user.FindFirst(DisplayName));
+            return claim.Value;
         }
 
         public static string GetEmail(this ClaimsPrincipal user)
