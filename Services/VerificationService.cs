@@ -52,17 +52,16 @@ namespace NetCore.Common.Services
         {
             Initialize();
 
-            long curTimeMs = DateUtils.CurrentTimeMillis;
-            long expiresAtUtc = curTimeMs + expiresInSec * 1000L;
-
             var verification = new Verification
             {
                 Series = NextSeries(),
-                Token = IdentityDigester.Digest(GetTokenData(token, identity, verifyCode, expiresAtUtc)),
+                Token = IdentityDigester.Digest(GetTokenData(token, verifyCode)),
                 HashIdentity = TokenDigester.Digest(identity.ToLower(CultureUtils.CultureEnglish))
             };
 
-            verification.ExpiresAtUtc = expiresAtUtc;
+            long curTimeMs = DateUtils.CurrentTimeMillis;
+
+            verification.ExpiresAtUtc = curTimeMs + expiresInSec * 1000L;
             verification.IssuedAtUtc = curTimeMs;
 
             await DoSaveVerification(verification);
@@ -92,7 +91,7 @@ namespace NetCore.Common.Services
             {
                 return false;
             }
-            if (!IdentityDigester.Verify(GetTokenData(token, identity, verifyCode, verification.ExpiresAtUtc.Value), verification.Token))
+            if (!IdentityDigester.Verify(GetTokenData(token, verifyCode), verification.Token))
             {
                 return false;
             }
@@ -103,9 +102,9 @@ namespace NetCore.Common.Services
             return true;
         }
 
-        protected string GetTokenData(string token, string identity, string verifyCode, long expiresAtUtc)
+        protected string GetTokenData(string token, string verifyCode)
         {
-            return token + identity + verifyCode + expiresAtUtc;
+            return token + verifyCode;
         }
     }
 }
