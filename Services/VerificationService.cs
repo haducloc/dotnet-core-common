@@ -14,7 +14,8 @@ namespace NetCore.Common.Services
         private TextDigester _identityDigester;
         public TextDigester IdentityDigester
         {
-            get {
+            get
+            {
                 Initialize();
                 return _identityDigester;
             }
@@ -29,7 +30,8 @@ namespace NetCore.Common.Services
 
         public PasswordDigester TokenDigester
         {
-            get {
+            get
+            {
                 Initialize();
                 return _tokenDigester;
             }
@@ -52,16 +54,18 @@ namespace NetCore.Common.Services
         {
             Initialize();
 
+            long curTimeMs = DateUtils.CurrentTimeMillis;
+            long expiresAtUtc = curTimeMs + expiresInSec * 1000L;
+            identity = identity.ToLower(CultureUtils.CultureEnglish);
+
             var verification = new Verification
             {
                 Series = NextSeries(),
-                Token = IdentityDigester.Digest(GetTokenData(token, verifyCode)),
-                HashIdentity = TokenDigester.Digest(identity.ToLower(CultureUtils.CultureEnglish))
+                Token = IdentityDigester.Digest(GetTokenData(token, identity, verifyCode, expiresAtUtc)),
+                HashIdentity = TokenDigester.Digest(identity)
             };
 
-            long curTimeMs = DateUtils.CurrentTimeMillis;
-
-            verification.ExpiresAtUtc = curTimeMs + expiresInSec * 1000L;
+            verification.ExpiresAtUtc = expiresAtUtc;
             verification.IssuedAtUtc = curTimeMs;
 
             await DoSaveVerification(verification);
@@ -87,11 +91,13 @@ namespace NetCore.Common.Services
             {
                 return false;
             }
-            if (!TokenDigester.Verify(identity.ToLower(CultureUtils.CultureEnglish), verification.HashIdentity))
+            identity = identity.ToLower(CultureUtils.CultureEnglish);
+
+            if (!TokenDigester.Verify(identity, verification.HashIdentity))
             {
                 return false;
             }
-            if (!IdentityDigester.Verify(GetTokenData(token, verifyCode), verification.Token))
+            if (!IdentityDigester.Verify(GetTokenData(token, identity, verifyCode, verification.ExpiresAtUtc.Value), verification.Token))
             {
                 return false;
             }
@@ -102,9 +108,9 @@ namespace NetCore.Common.Services
             return true;
         }
 
-        protected string GetTokenData(string token, string verifyCode)
+        protected string GetTokenData(string token, string identity, string verifyCode, long expiresAtUtc)
         {
-            return token + verifyCode;
+            return token + identity + verifyCode + expiresAtUtc;
         }
     }
 }
