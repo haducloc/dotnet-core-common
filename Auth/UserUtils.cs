@@ -51,7 +51,7 @@ namespace NetCore.Common.Auth
             return AssertUtils.AssertNotNull(claim.Value);
         }
 
-        public static void AddRoleClaims(List<Claim> claims, string roles)
+        public static void AddRoleClaims(IList<Claim> claims, string roles)
         {
             foreach (var role in UserUtils.ParseRoles(roles))
             {
