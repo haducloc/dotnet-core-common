@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace NetCore.Common.Base
 {
-    public class AppVersion
+    public class AppVersion : IComparable<AppVersion>
     {
         public int Major { get; set; }
 
@@ -23,28 +23,31 @@ namespace NetCore.Common.Base
         // Build - increased when minor changes are made, typically bug fixes and improvements(though no API changes)
         // Revision - Represents the build instance
 
-        public bool Parse(string version)
+        public static AppVersion Parse(string version)
         {
             AssertUtils.AssertNotNull(version);
             if (!VersionPattern.IsMatch(version))
             {
-                return false;
+                return null;
             }
             string[] numbers = version.Split(new char[] { '.' });
 
-            this.Major = int.Parse(numbers[0]);
-            this.Minor = int.Parse(numbers[1]);
+            var appVersion = new AppVersion
+            {
+                Major = int.Parse(numbers[0]),
+                Minor = int.Parse(numbers[1])
+            };
 
             if (numbers.Length >= 3)
             {
-                this.Build = int.Parse(numbers[2]);
+                appVersion.Build = int.Parse(numbers[2]);
             }
 
             if (numbers.Length == 4)
             {
-                this.Revision = int.Parse(numbers[3]);
+                appVersion.Revision = int.Parse(numbers[3]);
             }
-            return true;
+            return appVersion;
         }
 
         public new string ToString()
@@ -63,6 +66,22 @@ namespace NetCore.Common.Base
                 }
             }
             return sb.ToString();
+        }
+
+        public int CompareTo(AppVersion other)
+        {
+            AssertUtils.AssertNotNull(other);
+
+            var compare = ComparableUtils.Compare(this.Major, other.Major);
+            if (compare != 0) return compare;
+
+            compare = ComparableUtils.Compare(this.Minor, other.Minor);
+            if (compare != 0) return compare;
+
+            compare = ComparableUtils.Compare(this.Build ?? int.MinValue, other.Build ?? int.MinValue);
+            if (compare != 0) return compare;
+
+            return ComparableUtils.Compare(this.Revision ?? int.MinValue, other.Revision ?? int.MinValue);
         }
     }
 }
