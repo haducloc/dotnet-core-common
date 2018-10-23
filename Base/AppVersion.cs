@@ -16,7 +16,7 @@ namespace NetCore.Common.Base
 
         public int? Revision { get; set; }
 
-        static readonly Regex VersionPattern = new Regex(@"^[1-9]\d*(\.[1-9]\d*){1,3}$");
+        static readonly Regex VersionPattern = new Regex(@"^[1-9]\d*(\.(0|[1-9]\d*)){1,3}$");
 
         // Major - increased when the feature set/API of the software changes significantly
         // Minor - increased when notable changes are made, minor API changes or addition of new functionality
@@ -78,10 +78,10 @@ namespace NetCore.Common.Base
             compare = ComparableUtils.Compare(this.Minor, other.Minor);
             if (compare != 0) return compare;
 
-            compare = ComparableUtils.Compare(this.Build ?? int.MinValue, other.Build ?? int.MinValue);
+            compare = ComparableUtils.Compare(this.Build ?? 0, other.Build ?? 0);
             if (compare != 0) return compare;
 
-            return ComparableUtils.Compare(this.Revision ?? int.MinValue, other.Revision ?? int.MinValue);
+            return ComparableUtils.Compare(this.Revision ?? 0, other.Revision ?? 0);
         }
     }
 }
