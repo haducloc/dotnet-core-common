@@ -39,12 +39,13 @@ namespace NetCore.Common.DataAccess
             }
         }
 
-        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int? count, int pageIndex, int pageSize)
+        public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int? count, int? pageIndex, int pageSize)
         {
             var countVal = count ?? await source.CountAsync();
-            var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            var indexVal = pageIndex ?? 1;
+            var items = await source.Skip((indexVal - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            return new PaginatedList<T>(items, countVal, pageIndex, pageSize);
+            return new PaginatedList<T>(items, countVal, indexVal, pageSize);
         }
     }
 }
