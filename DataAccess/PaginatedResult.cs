@@ -11,14 +11,14 @@ namespace NetCore.Common.DataAccess
         // >= 1
         public int PageIndex { get; private set; }
 
-        public int TotalPages { get; private set; }
+        public int PageCount { get; private set; }
 
         public IList<T> Data { get; private set; }
 
         public PaginatedResult(IList<T> data, int count, int pageIndex, int pageSize)
         {
             PageIndex = pageIndex;
-            TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+            PageCount = (int)Math.Ceiling(count / (double)pageSize);
 
             this.Data = data;
         }
@@ -35,7 +35,7 @@ namespace NetCore.Common.DataAccess
         {
             get
             {
-                return (PageIndex < TotalPages);
+                return (PageIndex < PageCount);
             }
         }
 
