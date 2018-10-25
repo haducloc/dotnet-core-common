@@ -13,14 +13,14 @@ namespace NetCore.Common.DataAccess
 
         public int TotalPages { get; private set; }
 
-        public IList<T> Items { get; private set; }
+        public IList<T> Data { get; private set; }
 
-        public PaginatedList(IList<T> items, int count, int pageIndex, int pageSize)
+        public PaginatedList(IList<T> data, int count, int pageIndex, int pageSize)
         {
             PageIndex = pageIndex;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
 
-            this.Items = items;
+            this.Data = data;
         }
 
         public bool HasPreviousPage
