@@ -6,12 +6,12 @@ namespace NetCore.Common.Auth
 {
     public static class UserUtils
     {
-        public const string UserID = "/UID";
-        public const string UserName = "/UName";
-        public const string DisplayName = "/UDName";
+        public const string UserID = "UID";
+        public const string UserName = "UName";
+        public const string DisplayName = "DName";
 
-        public const string Email = "/UEmail";
-        public const string PhoneNumber = "/UTelNum";
+        public const string Email = "Email";
+        public const string PhoneNumber = "TelNum";
 
         public static int GetUserID(this ClaimsPrincipal user)
         {
