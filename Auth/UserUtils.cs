@@ -63,8 +63,7 @@ namespace NetCore.Common.Auth
             {
                 return StringUtils.EmptyStrings;
             }
-            string[] userRoles = SplitUtils.Split(roles, ',');
-            return userRoles;
+            return SplitUtils.Split(roles, ',', ';', '|');
         }
     }
 }
