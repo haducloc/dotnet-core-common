@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace NetCore.Common.DataAccess
+namespace NetCore.Common.Models
 {
-    public class PaginatedResult<T>
+    public class PagingResult<T>
     {
         // >= 1
         public int PageIndex { get; private set; }
@@ -15,7 +15,7 @@ namespace NetCore.Common.DataAccess
 
         public IList<T> Data { get; private set; }
 
-        public PaginatedResult(IList<T> data, int count, int pageIndex, int pageSize)
+        public PagingResult(IList<T> data, int count, int pageIndex, int pageSize)
         {
             PageIndex = pageIndex;
             PageCount = (int)Math.Ceiling(count / (double)pageSize);
@@ -39,13 +39,13 @@ namespace NetCore.Common.DataAccess
             }
         }
 
-        public static async Task<PaginatedResult<T>> CreateAsync(IQueryable<T> source, int? count, int? pageIndex, int pageSize)
+        public static async Task<PagingResult<T>> CreateAsync(IQueryable<T> source, int? count, int? pageIndex, int pageSize)
         {
             var countVal = count ?? await source.CountAsync();
             var indexVal = pageIndex ?? 1;
             var items = await source.Skip((indexVal - 1) * pageSize).Take(pageSize).ToListAsync();
 
-            return new PaginatedResult<T>(items, countVal, indexVal, pageSize);
+            return new PagingResult<T>(items, countVal, indexVal, pageSize);
         }
     }
 }

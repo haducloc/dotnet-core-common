@@ -1,6 +1,6 @@
 ﻿namespace NetCore.Common.Models
 {
-    public class PaginatedRequest<T>
+    public class PagingRequest<T>
     {
         public int? PageIndex { get; set; }
 
