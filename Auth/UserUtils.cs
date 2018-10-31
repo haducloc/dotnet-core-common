@@ -1,6 +1,9 @@
 ﻿using NetCore.Common.Utils;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace NetCore.Common.Auth
 {
@@ -63,7 +66,27 @@ namespace NetCore.Common.Auth
             {
                 return StringUtils.EmptyStrings;
             }
-            return SplitUtils.Split(roles, ',', ';', '|');
+            return SplitUtils.Split(roles, ',', ';');
+        }
+
+        public static bool ContainRole(string roles, string checkRole)
+        {
+            var parsedRoles = ParseRoles(roles);
+            if (parsedRoles.Length == 0)
+            {
+                return false;
+            }
+            return parsedRoles.Any(r => r.Equals(checkRole, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static bool IsValidRoles(string roles, Regex validator)
+        {
+            var parsedRoles = ParseRoles(roles);
+            if (parsedRoles.Length == 0)
+            {
+                return true;
+            }
+            return !parsedRoles.Any(r => !validator.IsMatch(r));
         }
     }
 }
