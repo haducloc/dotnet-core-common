@@ -69,14 +69,21 @@ namespace NetCore.Common.Auth
             return SplitUtils.Split(roles, ',', ';');
         }
 
-        public static bool ContainRole(string roles, string checkRole)
+        public static bool ContainRole(string roles, params string[] checkRoles)
         {
             var parsedRoles = ParseRoles(roles);
             if (parsedRoles.Length == 0)
             {
                 return false;
             }
-            return parsedRoles.Any(r => r.Equals(checkRole, StringComparison.OrdinalIgnoreCase));
+            foreach (var checkRole in checkRoles)
+            {
+                if (parsedRoles.Any(r => r.Equals(checkRole, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static bool IsValidRoles(string roles, Regex validator)
