@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NetCore.Common.Auth;
 using NetCore.Common.Services;
 using NetCore.Common.Utils;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NetCore.Common.Mvc
@@ -42,10 +42,10 @@ namespace NetCore.Common.Mvc
 
         public BadRequestObjectResult InvalidModelState()
         {
-            Result<ModelStateDictionary> result = new Result<ModelStateDictionary> { IsError = true, Message = "Model is invalid." };
+            var result = new Result<IDictionary<string, IList<string>>> { IsError = true, Message = "Model is invalid." };
             if (Config.IsDebugEnvironment)
             {
-                result.Data = ModelState;
+                result.Data = ModelState.ToErrorMap();
             }
             return BadRequest(result);
         }
