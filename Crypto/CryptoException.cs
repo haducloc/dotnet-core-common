@@ -8,6 +8,10 @@ namespace NetCore.Common.Crypto
         {
         }
 
+        public CryptoException(string message) : base(message)
+        {
+        }
+
         public CryptoException(Exception ex) : base(ex.Message, ex)
         {
         }
