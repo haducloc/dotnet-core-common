@@ -13,6 +13,8 @@ namespace NetCore.Common.Models
 
         public int PageCount { get; private set; }
 
+        public int RecordCount { get; private set; }
+
         public IList<T> Data { get; private set; }
 
         public PagingResult(IList<T> data, int count, int pageIndex, int pageSize)
@@ -20,7 +22,8 @@ namespace NetCore.Common.Models
             PageIndex = pageIndex;
             PageCount = (int)Math.Ceiling(count / (double)pageSize);
 
-            this.Data = data;
+            RecordCount = count;
+            Data = data;
         }
 
         public bool HasPreviousPage
