@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace NetCore.Common.Entities
 {
 
-    public class Verification : IVerification
+    public class RemMeToken : IVerification
     {
         [Required]
         [Key]

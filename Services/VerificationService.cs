@@ -2,14 +2,11 @@
 using NetCore.Common.Crypto;
 using NetCore.Common.Entities;
 using NetCore.Common.Utils;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NetCore.Common.Services
 {
-    public abstract class VerificationService : InitializeObject
+    public abstract class VerificationService<T> : InitializeObject where T : IVerification
     {
         private TextDigester _identityDigester;
         public TextDigester IdentityDigester
@@ -50,7 +47,9 @@ namespace NetCore.Common.Services
 
         protected string NextSeries() => UUIDUtils.randomUUID();
 
-        public async Task<string> SaveVerification(string token, string identity, int identityType, string verifyCode, int expiresInSec)
+        protected abstract T NewVerification();
+
+        public async Task<string> SaveVerification(string token, string identity, string verifyCode, int expiresInSec)
         {
             Initialize();
 
@@ -58,12 +57,11 @@ namespace NetCore.Common.Services
             long expiresAtUtc = curTimeMs + expiresInSec * 1000L;
             identity = identity.ToLower(CultureUtils.CultureEnglish);
 
-            var verification = new Verification
-            {
-                Series = NextSeries(),
-                Token = IdentityDigester.Digest(GetTokenData(token, identity, verifyCode, expiresAtUtc)),
-                HashIdentity = TokenDigester.Digest(identity)
-            };
+            var verification = NewVerification();
+
+            verification.Series = NextSeries();
+            verification.Token = TokenDigester.Digest(GetTokenData(token, identity, verifyCode, expiresAtUtc));
+            verification.HashIdentity = IdentityDigester.Digest(identity);
 
             verification.ExpiresAtUtc = expiresAtUtc;
             verification.IssuedAtUtc = curTimeMs;
@@ -72,11 +70,11 @@ namespace NetCore.Common.Services
             return verification.Series;
         }
 
-        protected abstract Task DoSaveVerification(Verification verification);
+        protected abstract Task DoSaveVerification(T verification);
 
-        protected abstract Task<Verification> DoGetVerification(string series);
+        protected abstract Task<T> DoGetVerification(string series);
 
-        public Task<Verification> GetVerification(string series)
+        public Task<T> GetVerification(string series)
         {
             Initialize();
             return DoGetVerification(series);
@@ -93,11 +91,11 @@ namespace NetCore.Common.Services
             }
             identity = identity.ToLower(CultureUtils.CultureEnglish);
 
-            if (!TokenDigester.Verify(identity, verification.HashIdentity))
+            if (!IdentityDigester.Verify(identity, verification.HashIdentity))
             {
                 return false;
             }
-            if (!IdentityDigester.Verify(GetTokenData(token, identity, verifyCode, verification.ExpiresAtUtc.Value), verification.Token))
+            if (!TokenDigester.Verify(GetTokenData(token, identity, verifyCode, verification.ExpiresAtUtc.Value), verification.Token))
             {
                 return false;
             }
