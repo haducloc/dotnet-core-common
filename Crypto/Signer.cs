@@ -4,9 +4,8 @@ using System;
 
 namespace NetCore.Common.Crypto
 {
-    public class SignerEncryptor : InitializeObject, Encryptor
+    public class Signer : InitializeObject, Encryptor
     {
-
         private Encryptor _Encryptor;
         public Encryptor Encryptor
         {
@@ -18,20 +17,20 @@ namespace NetCore.Common.Crypto
             }
         }
 
-        private Digester _Signer;
-        public Digester Signer
+        private Digester _Digester;
+        public Digester Digester
         {
-            get { return _Signer; }
+            get { return _Digester; }
             set
             {
                 AssertNotInitialized();
-                _Signer = value;
+                _Digester = value;
             }
         }
 
         protected override void Init()
         {
-            AssertUtils.AssertNotNull(_Signer);
+            AssertUtils.AssertNotNull(_Digester);
         }
 
         public byte[] Encrypt(byte[] message)
@@ -40,9 +39,9 @@ namespace NetCore.Common.Crypto
             AssertUtils.AssertNotNull(message);
 
             byte[] encrypted = (this.Encryptor != null) ? this.Encryptor.Encrypt(message) : message;
-            byte[] digested = this.Signer.Digest(encrypted);
+            byte[] digested = this.Digester.Digest(encrypted);
 
-            if (this.Signer.GetDigestSize() > 0)
+            if (this.Digester.GetDigestSize() > 0)
             {
                 return ArrayUtils.Append(digested, encrypted);
             }
@@ -60,12 +59,12 @@ namespace NetCore.Common.Crypto
             byte[] digested = null;
             byte[] parsedMsg = null;
 
-            int digestLength = this.Signer.GetDigestSize();
+            int digestLength = this.Digester.GetDigestSize();
             if (digestLength > 0)
             {
                 digested = new byte[digestLength];
-
                 AssertUtils.AssertTrue(message.Length > digestLength, "message is invalid.");
+
                 parsedMsg = new byte[message.Length - digestLength];
                 ArrayUtils.Copy(message, digested, parsedMsg);
             }
@@ -74,7 +73,7 @@ namespace NetCore.Common.Crypto
                 throw new Exception("Not implemented");
             }
 
-            if (!this.Signer.Verify(parsedMsg, digested))
+            if (!this.Digester.Verify(parsedMsg, digested))
             {
                 throw new CryptoException("The message was tampered.");
             }
