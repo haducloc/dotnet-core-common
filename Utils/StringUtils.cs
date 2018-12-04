@@ -6,6 +6,12 @@ namespace NetCore.Common.Utils
     {
         public static readonly string[] EmptyStrings = { };
 
+        public static string FirstUpperCase(this string str)
+        {
+            if (string.IsNullOrEmpty(str)) return null;
+            return char.ToUpper(str[0]) + str.Substring(1);
+        }
+
         public static string TrimToNull(this string str)
         {
             return TrimToDefault(str, null);
@@ -44,6 +50,23 @@ namespace NetCore.Common.Utils
             if (str == null)  return null;
             str = NonDigits.Replace(str, string.Empty);
             return (str.Length > 0) ? str : null;
+        }
+
+        public static string Trim(string text, char charToTrim)
+        {
+            int start = -1;
+            while ((++start < text.Length) && (text[start] == charToTrim))
+            {
+            }
+            int end = text.Length;
+            while ((--end >= 0) && (text[end] == charToTrim))
+            {
+            }
+            if (start >= end)
+            {
+                return string.Empty;
+            }
+            return text.Substring(start, end - start + 1);
         }
     }
 }
